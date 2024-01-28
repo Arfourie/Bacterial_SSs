@@ -1,8 +1,7 @@
 #August 2023
 #Arista Fourie
 #Process the results produced by DIAMOND blastx to identify genes with >60% read coverage
-#Convert read counts to Transcripts per kilobase million (TPM) 
-#and adjust the counts based on the abundance of speficic phyla that encode for the specific SS
+#Convert read counts to Transcripts per kilobase million (TPM) and adjust the counts based on the abundance of speficic phyla that encode for the specific SS
 
 library(dplyr)
 library(ggplot2)
@@ -13,7 +12,7 @@ setwd("plant")
 path <- "plant/diamond"
 path2 <- "plant/diamond/summaries"
 
-#Information on phylum adundance in eahc sample dataset, as produced by the script 1_Summarise_kaiju_table_for_SS_Summaries.R
+#Information on phylum adundance in eahc sample dataset, as produced by the script Identification_of_SSs1_Summarise_kaiju_table_for_SS_Summaries.R
 Phyla_abund <- read.table("plant/Kaiju_phyla_summary.tsv", header = TRUE, sep = "\t", dec = ".") 
 
 #Provide the SS gene information of the genes identified in the metagenomic contigs
