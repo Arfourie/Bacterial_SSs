@@ -2,6 +2,7 @@
 #Arista Fourie
 #Combine DESeq2 results from all datasets to identify families with SS's enriched in multiple studies.
 #Create a heatmap to illustrate the log fold enrichment of a SS of a specific family in rhizosphere or soil
+#A horizontal barplot is also created to summarise in how many datasets each SS was observed, per family
 library(dplyr)
 library(ggplot2)
 library(ggpubr)
@@ -42,3 +43,29 @@ ggplot(SS_summaries_select, aes(plant, Family, fill=log2FoldChange)) +
 ggsave(filename = "Heatmap select SS families all plants_maxLog5.jpeg", device="jpeg", width=38, height =46, units="cm")
 write.table(SS_summaries_select, "Select SS's logfold values in all plants.tsv",
             sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)  
+
+#Summarise data for horizontal barplot and create plot
+Subset_families <- unique(Fig_labels$Family)
+Subset_families <- Subset_families[1:41]
+Subset_families <- as.data.frame(Subset_families)
+colnames(Subset_families) <- "Family"
+Barchart_select <- SS_summaries_select %>%
+  select(-baseMean,-padj) 
+Barchart_select$log2FoldChange[Barchart_select$log2FoldChange > 0] <- 1
+Barchart_select$log2FoldChange[Barchart_select$log2FoldChange < 0] <- 0  
+Barchart_select[is.na(Barchart_select)] <- 0
+Summarise_bar <- Barchart_select %>% 
+  filter(log2FoldChange > 0) %>% 
+  group_by(SS,Family) %>% 
+  count(Family)
+Barchart_data <-left_join(Subset_families,Summarise_bar, by="Family")
+Fig_labels <- Subset_families
+Barchart_data$Family <- factor(Barchart_data$Family, levels=unique(Fig_labels$Family))
+
+ggplot(Barchart_data, aes(fill=SS, n,Family)) +
+  geom_bar(position="stack", stat = "identity", colour="black") +
+  theme(panel.grid = element_blank(),panel.background = element_rect(fill = "white"), 
+        axis.title.x = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(hjust=0)) + 
+  xlab("Nr. of datasets with rizosphere enriched SS") +
+  scale_x_reverse()
+ggsave(filename = "Barplot SS counts in studies for significant families 11Jan24.jpeg", device="jpeg", width=20, height =15, units="cm")
