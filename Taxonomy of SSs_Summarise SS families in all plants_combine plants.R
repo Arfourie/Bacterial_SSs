@@ -1,8 +1,8 @@
 #August 2023
 #Arista Fourie
 #Combine results from all datasets to identify trends where the same families with the same SS's were identified in the majority of datasets.
-#The abundance of a SS per family is summarised over all datasets to be visualised in a heatmap. Only families observed in 8-10 of the studies are shown.
-#Output file was used to construct heatmap in iTOL.
+#The abundance of a SS per family is summarised over all datasets to be visualised in a heatmap. Only families observed in 8-10 of the studies are shown. Output file was used to construct heatmap in iTOL.
+#A horizontal barplot is also created to summarise in how many datasets each SS was observed, per family
 library(dplyr)
 library(tidyr)
 library(stringr)
@@ -58,3 +58,13 @@ Core80_inAll_summarise <- Core80_inAll_summarise %>%
   summarise(Nr_hosts = sum(plant))
 Core80_inAll_summarise$Nr_hosts[Core80_inAll_summarise$Nr_hosts<8] <- 0
 write.table(Core80_inAll_summarise, "Core80 families_heatmap.txt",sep="\t", quote = FALSE, row.names = FALSE)
+
+Family_count <- Core80_inAll_summarise
+Family_count <- subset(Family_count, Nr_hosts > 0) %>% 
+  count(SS)
+
+SS_Family_count <- ggplot(Family_count, aes(n,SS)) +
+  geom_bar(stat = "identity") +
+  theme(panel.grid = element_blank(),panel.background = element_rect(fill = "white"), axis.title.x = element_text(size = 20), axis.text.x = element_text(size = 20)) + 
+  xlab("Nr. of families")
+ggsave(filename = "Barplot SS family counts.jpeg", device="jpeg", width=20, height =15, units="cm")
