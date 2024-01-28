@@ -1,7 +1,7 @@
 #August 2023
 #Arista Fourie
 #This script produces a barplot to summarise the abundance of each of the genes of the respective SSs in the metatranscriptomic data. 
-#Data processed and summarised in the previous script is used as input
+#Data processed and summarised in the previous script is used as input (Transcriptome Summarise read total in TPM)
 
 library(dplyr)
 library(stringr)
