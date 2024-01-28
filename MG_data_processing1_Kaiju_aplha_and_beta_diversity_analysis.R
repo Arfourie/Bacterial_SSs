@@ -14,6 +14,7 @@ library("vegan")
 library(ggpubr)
 library(pairwiseAdonis)
 library(UpSetR)
+path <- "Selected directory"
 Kaiju_files <- sort(list.files(path, pattern="summary_genus_rn.tsv",full.names = TRUE))
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7","#7729C4","#5CD1B6")
 
