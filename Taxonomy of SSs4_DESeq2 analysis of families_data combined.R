@@ -68,4 +68,4 @@ ggplot(Barchart_data, aes(fill=SS, n,Family)) +
         axis.title.x = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(hjust=0)) + 
   xlab("Nr. of datasets with rizosphere enriched SS") +
   scale_x_reverse()
-ggsave(filename = "Barplot SS counts in studies for significant families 11Jan24.jpeg", device="jpeg", width=20, height =15, units="cm")
+ggsave(filename = "Barplot SS counts in studies for significant families.jpeg", device="jpeg", width=20, height =15, units="cm")
