@@ -1,7 +1,7 @@
 #August 2023
 #Arista Fourie
-#The read mappings to CDSs were counted and converted to TPM by HiSeq. Here results are combined for all samples and modified to
-#create barplots that can summarise transcript abundance of the SS genes.
+#The read mappings to CDSs were counted and converted to TPM by HiSeq. 
+#Here results are combined for all samples and modified to create barplots that can summarise transcript abundance of the SS genes.
 
 library(dplyr)
 library(stringr)
