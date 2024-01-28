@@ -1,7 +1,7 @@
 #August 2023
 #Arista Fourie
 #Analysis of alpha and beta diversity of metagenomic data, based on kaiju classification of reads on genus rank.
-#This includes beta-diversity analysis of the combined data from all plant datasets, individual beta-diversity analyses were performed per dataset in antoher script (MG data processing2_Kaiju beta diversity indiv analysis.R)
+#This includes beta-diversity analysis of the combined data from all plant datasets, individual beta-diversity analyses were performed per dataset in another script (MG data processing2_Kaiju beta diversity indiv analysis.R)
 #Read abundance of genera were converted to a phyloseq object to analyse data in a similar manner as metabarcoding data
 #The identified genera were also used to construct an UpSet plot to summarise the core genera in the rhizosphere
 
