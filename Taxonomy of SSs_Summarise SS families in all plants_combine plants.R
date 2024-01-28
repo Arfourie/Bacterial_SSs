@@ -2,7 +2,7 @@
 #Arista Fourie
 #Combine results from all datasets to identify trends where the same families with the same SS's were identified in the majority of datasets.
 #The abundance of a SS per family is summarised over all datasets to be visualised in a heatmap. Only families observed in 8-10 of the studies are shown. Output file was used to construct heatmap in iTOL.
-#A horizontal barplot is also created to summarise in how many datasets each SS was observed, per family
+#A horizontal barplot is also created to summarise the number of families in which a SS was oberved.
 library(dplyr)
 library(tidyr)
 library(stringr)
