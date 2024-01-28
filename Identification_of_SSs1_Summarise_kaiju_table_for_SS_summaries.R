@@ -2,6 +2,7 @@
 #Arista Fourie
 #Summarise the taxonomic classification of the reads for each sample dataset, as produced by Kaiju. 
 #This script is based on phylum rank summaries and also filters for the specific phyla of interest to obtain the total number of reads assigned to each phylum 
+#The output was used in the next script to incorporate for calculation of SS abundance (Identification of SSs2_Summarise_diamond_results_convert_to_TPM.R)
 
 
 library(dplyr)
