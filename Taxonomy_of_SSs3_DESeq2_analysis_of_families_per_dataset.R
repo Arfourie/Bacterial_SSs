@@ -5,9 +5,9 @@ library(dplyr)
 library(DESeq2)
 library(ggpubr)
 path <- "DeSeq/"
-SS_family_abundance<- sort(list.files(path, pattern="TPMGeneAvg_avg per family_rounded.tsv",full.names = TRUE))
+SS_family_abundance<- sort(list.files(path, pattern="MRPMGeneAvg_avg per family_rounded.tsv",full.names = TRUE))
 
-#Added manual size factor of 1, since values are already TPM values, thus it should not be further adjusted to a relative abundance
+#Added manual size factor of 1, since values are already MRPM values, thus it should not be further adjusted to a relative abundance
 AllSS_res_summary <- data.frame()
 for (i in SS_family_abundance){
   SS.name <- sapply(strsplit(basename(i), "_"), `[`, 1)
