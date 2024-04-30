@@ -8,7 +8,7 @@ library("ggpubr")
 library(stringr)
 library(tidyr)
 path <- "Plant"
-SS_genes_TPM<- sort(list.files(path, pattern="TPM_SS_genes_AllReads",full.names = TRUE))
+SS_genes_MRPM<- sort(list.files(path, pattern="MRPM_SS_genes_AllReads",full.names = TRUE))
 GTDB_taxon <- read.table("GTDBbac120_ncbitaxonomy.tsv",
                           header = TRUE, sep = "\t", colClasses = "character", na.strings = c("","\t")) %>% 
   dplyr::rename(ID = ident)
@@ -19,8 +19,8 @@ MGcontigs_taxon <- read.table("plant_SS_genes_CAT_lineage_info.tsv",
 Summary_SSs_family <- data.frame()
 for (i in SS_genes_mapping) {
   MG.name <- sapply(strsplit(basename(i), "_"), `[`, 1)
-  SS_genes_TPM <- read.table(i, header = TRUE, sep = "\t")
-  SS_genes_TPM <- filter(SS_genes_TPM, !str_detect(SS_gene,"T4P") & !str_detect(SS_gene,"Tad") & !str_detect(SS_gene,"Flg") & SS_gene != "T2SS_gspC" & SS_gene !="T2SS_gspD"
+  SS_genes_MRPM <- read.table(i, header = TRUE, sep = "\t")
+  SS_genes_MRPM <- filter(SS_genes_MRPM, !str_detect(SS_gene,"T4P") & !str_detect(SS_gene,"Tad") & !str_detect(SS_gene,"Flg") & SS_gene != "T2SS_gspC" & SS_gene !="T2SS_gspD"
                                 & SS_gene !="T2SS_gspE" & SS_gene !="T2SS_gspF" & SS_gene !="T2SS_gspG" & SS_gene !="T2SS_gspL"
                                 & SS_gene !="T2SS_gspM" & SS_gene !="T2SS_gspN" & SS_gene !="T2SS_gspO" & !str_detect(SS_gene,"t4cp1") 
                                 & !str_detect(SS_gene,"virb4") & SS_gene != "T4SS.I_traI" & SS_gene != "T4SS.I_traK" 
@@ -30,18 +30,18 @@ for (i in SS_genes_mapping) {
                                 & SS_gene != "T6SSi_evpJ" & SS_gene != "T6SSi_tssA" & SS_gene != "T6SSi_tssB" & SS_gene != "T6SSi_tssC"
                                 & SS_gene != "T6SSi_tssD" & SS_gene != "T6SSi_tssE" & SS_gene != "T6SSi_tssF" & SS_gene != "T6SSi_tssG"
                                 & SS_gene != "T6SSi_tssH" & SS_gene != "T6SSi_tssI" & SS_gene != "T6SSi_tssK")
-  SS_genes_TPM$ID <- sub("_([^_]*)$", "", SS_genes_TPM$DB_gene)
+  SS_genes_MRPM$ID <- sub("_([^_]*)$", "", SS_genes_MRPM$DB_gene)
   #Split genes from GTDB and those from metagenomes
-  GTDB_match <- SS_genes_TPM %>%
+  GTDB_match <- SS_genes_MRPM %>%
     filter(!str_detect(ID,"^SRR")) 
-  MGs_DB_match <- SS_genes_TPM %>% 
+  MGs_DB_match <- SS_genes_MRPM %>% 
    filter(str_detect(ID,"^SRR"))
   
   #Merge taxonomy info from each database with diamond results
   GTDB_match_taxonID <- merge(GTDB_match, GTDB_taxon, by.x = "ID", all.x=TRUE, incomparables=NULL, no.dups=FALSE) %>% 
-    select(SS,SS_gene,DB_gene,TPM,phylum,class,order,family,genus)
+    select(SS,SS_gene,DB_gene,MRPM,phylum,class,order,family,genus)
   MGs_DB_match_taxonID <- merge(MGs_DB_match, MGcontigs_taxon, by.x = "DB_gene", all.x=TRUE, incomparables=NULL, no.dups=FALSE) %>% 
-    select(SS,SS_gene,DB_gene,TPM,phylum,class,order,family,genus)
+    select(SS,SS_gene,DB_gene,MRPM,phylum,class,order,family,genus)
   Combined_SS <- rbind(GTDB_match_taxonID,MGs_DB_match_taxonID)
   Combined_SS[is.na(Combined_SS)] <- "unclassified"
   Combined_SS[Combined_SS == "no support"] <- "unclassified"
@@ -51,7 +51,7 @@ for (i in SS_genes_mapping) {
   #Determine abundance of family for each SS
   MG_Group <- Combined_SS %>% 
     group_by(SS, SS_gene, family) %>% 
-    summarise(Avg_SS_gene_fam=sum(TPM))
+    summarise(Avg_SS_gene_fam=sum(MRPM))
   MG_Group$name <- rep(MG.name, times= length(MG_Group$family))
   Summary_SSs_family <- rbind(Summary_SSs_family,MG_Group)
 }  
@@ -103,6 +103,6 @@ for (g in SS_list){
   is.num <- sapply(SS_summary, is.numeric)
   SS_summary[is.num] <- lapply(SS_summary[is.num], round, 0)
   SS_summary[is.na(SS_summary)] <- 0
-  fileout=paste0(path,"/DESeq/",SS_name,"_TPMGeneAvg_avg per family_rounded.tsv")
+  fileout=paste0(path,"/DESeq/",SS_name,"_MRPMGeneAvg_avg per family_rounded.tsv")
   write.table(SS_summary, fileout, sep = "\t", col.names = TRUE, row.names = FALSE, quote = FALSE)
 }
