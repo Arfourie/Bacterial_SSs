@@ -1,7 +1,7 @@
 #August 2023
 #Arista Fourie
 #Process the results produced by DIAMOND blastx to identify genes with >60% read coverage
-#Convert read counts to Transcripts per kilobase million (TPM) and adjust the counts based on the abundance of speficic phyla that encode for the specific SS
+#Convert read counts to Metagenomic Reads per Kilobase Million (MRPM) and adjust the counts based on the abundance of speficic phyla that encode for the specific SS
 
 library(dplyr)
 library(ggplot2)
@@ -60,24 +60,24 @@ for (f in diamond_files) {
   write.table(Summary_gene_60cov, file.out, sep="\t", col.names=TRUE, row.names=FALSE, quote = FALSE)
 }
 
-#Add SS info to genes and calculate their TPM from the read mapping data
+#Add SS info to genes and calculate their MRPM from the read mapping data
 diamond_Summ_files<- sort(list.files(path2, pattern="_Summary_genes_GTDB_MGs_60cov.tsv",full.names = TRUE))
 for (h in diamond_Summ_files) {
   sample.name <- sapply(strsplit(basename(h), "_Summary"), `[`, 1)
   input <- read.table(h, header = TRUE, sep = "\t")
   input$RPK <- input$Nr_reads_mapped / (input$Gene_length/1000)
   PerMil <- sum(input$RPK) / 1000000
-  input$TPM <- input$RPK / PerMil
-  Final_TMP_result <- merge(input, All_genes_DB_SSinfo, by.x = "DB_gene", all.x=TRUE, incomparables=NULL, no.dups=FALSE)
-  Final_TMP_result <- Final_TMP_result %>% 
-    select(SS,SS_gene,DB_gene,TPM)
-  file.out <- file.path(path2,paste0(sample.name,"_TPM_SS_genes_AllReads.tsv"))
-  write.table(Final_TMP_result, file.out, sep="\t", col.names=TRUE, row.names=FALSE, quote = FALSE)
-  SS_abund_summary <- Final_TMP_result %>%
+  input$MRPM <- input$RPK / PerMil
+  Final_MRPM_result <- merge(input, All_genes_DB_SSinfo, by.x = "DB_gene", all.x=TRUE, incomparables=NULL, no.dups=FALSE)
+  Final_MRPM_result <- Final_MRPM_result %>% 
+    select(SS,SS_gene,DB_gene,MRPM)
+  file.out <- file.path(path2,paste0(sample.name,"_MRPM_SS_genes_AllReads.tsv"))
+  write.table(Final_MRPM_result, file.out, sep="\t", col.names=TRUE, row.names=FALSE, quote = FALSE)
+  SS_abund_summary <- Final_MRPM_result %>%
     group_by(SS_gene) %>%
-    summarise(sum_TPM=sum(TPM))
+    summarise(sum_MRPM=sum(MRPM))
   SS_abund_summary$SS <- sapply(strsplit(basename(SS_abund_summary$SS_gene), "_"), `[`, 1)
-  file2.out <- file.path(path2,paste0(sample.name,"_TPM_SS_abundance_summary.tsv"))
+  file2.out <- file.path(path2,paste0(sample.name,"_MRPM_SS_abundance_summary.tsv"))
   write.table(SS_abund_summary, file2.out, sep="\t", col.names=TRUE, row.names=FALSE, quote = FALSE)
 }
 #Determine abundance of specifically revelant phyla in all samples
@@ -93,7 +93,7 @@ Bacteroidetes <- filter(Phyla_abund, phylum=="Bacteroidetes") %>%
   
 #Remove genes not part of the calculation for SS abundance
 #Summarise for each SS the abundance and also adjust abundance based on abudance of the phyla the encode for the SS
-SS_abund_files<- sort(list.files(path2, pattern="_TPM_SS_abundance_summary",full.names = TRUE))
+SS_abund_files<- sort(list.files(path2, pattern="_MRPM_SS_abundance_summary",full.names = TRUE))
 SS_abund_files_allSamples = data.frame()
 for (i in SS_abund_files) {
   MGsample <- read.table(i,header = TRUE, sep="\t")
@@ -111,20 +111,20 @@ for (i in SS_abund_files) {
   MGsample_Proteo <- filter(All_Proteobacteria, sample==MGsample.name)
   MGsample_Proteo_chlam <- filter(Proteo_Chlam, sample==MGsample.name) 
   MGsample_Bacteroid <- filter(Bacteroidetes, sample==MGsample.name)
-  SS_TPM <- MGsample %>% 
+  SS_MRPM <- MGsample %>% 
     group_by(SS) %>% 
-    summarise(med_TPM=median(sum_TPM))
-  T2and6SS <- filter(SS_TPM, SS=="T2SS" | SS=="T6SSi")
-  T2and6SS$Adjusted_abund <- T2and6SS$med_TPM * (MGsample_Proteo$Proteobacteria_RA)
+    summarise(med_MRPM=median(sum_MRPM))
+  T2and6SS <- filter(SS_MRPM, SS=="T2SS" | SS=="T6SSi")
+  T2and6SS$Adjusted_abund <- T2and6SS$med_MRPM * (MGsample_Proteo$Proteobacteria_RA)
   T2and6SS$sample <- rep(MGsample.name, times= length(T2and6SS$Adjusted_abund))
-  T1_4andT5SS <- filter(SS_TPM, SS=="T1SS" | SS=="T4SS.T" | SS=="T4SS.I" | SS=="T5aSS" | SS=="T5bSS" | SS=="T5cSS") 
-  T1_4andT5SS$Adjusted_abund <- T1_4andT5SS$med_TPM / 1
+  T1_4andT5SS <- filter(SS_MRPM, SS=="T1SS" | SS=="T4SS.T" | SS=="T4SS.I" | SS=="T5aSS" | SS=="T5bSS" | SS=="T5cSS") 
+  T1_4andT5SS$Adjusted_abund <- T1_4andT5SS$med_MRPM / 1
   T1_4andT5SS$sample <- rep(MGsample.name, times= length(T1_4andT5SS$Adjusted_abund))
-  T3SS <- filter(SS_TPM, SS=="T3SS")
-  T3SS$Adjusted_abund <- T3SS$med_TPM * (MGsample_Proteo_chlam$Proteo_Chlam_RA)
+  T3SS <- filter(SS_MRPM, SS=="T3SS")
+  T3SS$Adjusted_abund <- T3SS$med_MRPM * (MGsample_Proteo_chlam$Proteo_Chlam_RA)
   T3SS$sample <- rep(MGsample.name, times= length(T3SS$Adjusted_abund))
-  T6SSiii_T9 <- filter(SS_TPM, SS=="T6SSiii" | SS=="T9SS")
-  T6SSiii_T9$Adjusted_abund <- T6SSiii_T9$med_TPM * (MGsample_Bacteroid$Bacteroidetes_RA)
+  T6SSiii_T9 <- filter(SS_MRPM, SS=="T6SSiii" | SS=="T9SS")
+  T6SSiii_T9$Adjusted_abund <- T6SSiii_T9$med_MRPM * (MGsample_Bacteroid$Bacteroidetes_RA)
   T6SSiii_T9$sample <- rep(MGsample.name, times= length(T6SSiii_T9$Adjusted_abund))
   SS_abund_files_allSamples <- rbind(SS_abund_files_allSamples,T2and6SS,T1_4andT5SS,T3SS,T6SSiii_T9)
 }
