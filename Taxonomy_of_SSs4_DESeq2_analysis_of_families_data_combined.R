@@ -7,7 +7,7 @@ library(dplyr)
 library(ggplot2)
 library(ggpubr)
 path <- "Summarise_all_plants/DESeq/"
-SS_family_abundance<- sort(list.files(path, pattern="AllSS_res_summary_filter",full.names = TRUE))
+SS_family_abundance<- sort(list.files(path, pattern="_filt_rawReadsAvg",full.names = TRUE))
 
 SS_summaries_All <- data.frame()
 for (i in SS_family_abundance){
@@ -44,9 +44,9 @@ ggsave(filename = "Heatmap select SS families all plants_maxLog5.jpeg", device="
 write.table(SS_summaries_select, "Select SS's logfold values in all plants.tsv",
             sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)  
 
-#Summarise data for horizontal barplot and create plot
+#Create Barplot for larger figure - SS counts in studies for significant families
 Subset_families <- unique(Fig_labels$Family)
-Subset_families <- Subset_families[1:41]
+Subset_families <- Subset_families[1:44]
 Subset_families <- as.data.frame(Subset_families)
 colnames(Subset_families) <- "Family"
 Barchart_select <- SS_summaries_select %>%
@@ -69,3 +69,4 @@ ggplot(Barchart_data, aes(fill=SS, n,Family)) +
   xlab("Nr. of datasets with rizosphere enriched SS") +
   scale_x_reverse()
 ggsave(filename = "Barplot SS counts in studies for significant families.jpeg", device="jpeg", width=20, height =15, units="cm")
+
