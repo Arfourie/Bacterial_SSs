@@ -59,6 +59,7 @@ Core80_inAll_summarise <- Core80_inAll_summarise %>%
 Core80_inAll_summarise$Nr_hosts[Core80_inAll_summarise$Nr_hosts<8] <- 0
 write.table(Core80_inAll_summarise, "Core80 families_heatmap.txt",sep="\t", quote = FALSE, row.names = FALSE)
 
+#Create barplot of SS family counts for larger figure
 Family_count <- Core80_inAll_summarise
 Family_count <- subset(Family_count, Nr_hosts > 0) %>% 
   count(SS)
@@ -68,3 +69,4 @@ SS_Family_count <- ggplot(Family_count, aes(n,SS)) +
   theme(panel.grid = element_blank(),panel.background = element_rect(fill = "white"), axis.title.x = element_text(size = 20), axis.text.x = element_text(size = 20)) + 
   xlab("Nr. of families")
 ggsave(filename = "Barplot SS family counts.jpeg", device="jpeg", width=20, height =15, units="cm")
+
